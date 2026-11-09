@@ -1,0 +1,62 @@
+[project]
+name = "hallucination-firewall"
+version = "0.1.0"
+description = "An MCP server that checks an agent's final answer against the tool outputs it actually received, and blocks or flags unsupported claims."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Parvathy Raj" }]
+keywords = ["mcp", "hallucination", "llm", "fact-checking", "agents", "claude"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "mcp>=1.9",
+  "rank-bm25>=0.2.2",
+  "numpy>=1.26",
+  "httpx>=0.27",
+  "pydantic>=2.6",
+]
+
+[project.optional-dependencies]
+# Tier 1 (NLI fact-checking model) and dense retrieval. Runs on CPU.
+ml = ["sentence-transformers>=3.0", "torch>=2.2", "transformers>=4.40"]
+eval = ["matplotlib>=3.8", "tabulate>=0.9"]
+
+[project.scripts]
+hfw = "hfw.cli:main"
+hfw-hook = "hfw.hooks:main"
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-asyncio>=0.23", "ruff>=0.5"]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hfw"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501", "E741", "B008", "UP042"]
+
+[tool.ruff.lint.per-file-ignores]
+"evals/*" = ["E402"]

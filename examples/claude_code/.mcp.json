@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "hfw": {
+      "command": "uv",
+      "args": [
+        "run", "--project", "/path/to/hallucination-firewall",
+        "hfw", "serve",
+        "--proxy", "/path/to/hallucination-firewall/examples/claude_code/downstream.json"
+      ],
+      "env": {
+        "HFW_LLM_PROVIDER": "anthropic",
+        "HFW_LLM_MODEL": "claude-haiku-4-5",
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}"
+      }
+    }
+  }
+}

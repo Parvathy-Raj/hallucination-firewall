@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "uae_docs": {
+      "command": "uv",
+      "args": ["run", "--project", "/path/to/hallucination-firewall", "python", "/path/to/hallucination-firewall/examples/uae_docs_server.py"],
+      "env": {"UAE_DOCS_CHUNKS": "/path/to/uae-regulatory-rag/data/chunks.jsonl"}
+    }
+  }
+}

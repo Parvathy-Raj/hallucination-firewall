@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.hfw/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+evals/data/
+evals/custom_traces/*.jsonl
+docs/demo/frames/

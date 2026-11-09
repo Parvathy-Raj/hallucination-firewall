@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "hallucination-firewall": {
+      "command": "uv",
+      "args": [
+        "run", "--project", "/path/to/hallucination-firewall",
+        "hfw", "serve",
+        "--proxy", "/path/to/hallucination-firewall/examples/claude_code/downstream.json"
+      ],
+      "env": {
+        "HFW_LLM_PROVIDER": "anthropic",
+        "ANTHROPIC_API_KEY": "sk-ant-...",
+        "HFW_LEDGER": "/path/to/hallucination-firewall/.hfw/ledger.jsonl"
+      }
+    }
+  }
+}
