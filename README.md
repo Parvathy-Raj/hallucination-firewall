@@ -108,6 +108,15 @@ except HallucinationBlocked as e:
 
 Full example: [`examples/sdk_example.py`](examples/sdk_example.py).
 
+### Use it as an agent skill (no install)
+
+[`skill/hallucination-firewall/`](skill/hallucination-firewall/) is an agent skill with the
+same checking rules written out for the agent. If the MCP tools are connected, the agent calls
+`verify_answer`. If not, it checks the draft against its tool outputs by hand: exact
+numbers, dates and names, then meaning. It fixes or removes flagged claims and cites the
+rest. Copy the folder into `.claude/skills/`, or build the zip with
+`python scripts/build_skill.py`.
+
 ### Configuration
 
 | Variable | Default | Meaning |
@@ -161,6 +170,9 @@ src/hfw/
 └── cli.py           `hfw serve`, `hfw verify`
 evals/               datasets, runner, custom traces, results/
 examples/            Claude Code / Desktop configs, demo server, SDK example
+skill/               agent skill (manual checking rules + MCP usage)
+scripts/             build_skill.py (skill zip)
+docs/demo/           demo video renderer
 tests/               pytest (offline, no models needed)
 ```
 

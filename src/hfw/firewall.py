@@ -43,10 +43,13 @@ class Firewall:
     ):
         self.settings = settings or Settings()
         self.policy = policy or Policy()
-        self.ledger = ledger or Ledger(
-            self.settings.ledger_path if persist else None, embed_model=self.settings.embed_model
-        )
-        self.llm = llm or LLM.from_settings(self.settings)
+        # `is None` checks: an empty Ledger is falsy (it defines __len__).
+        if ledger is None:
+            ledger = Ledger(
+                self.settings.ledger_path if persist else None, embed_model=self.settings.embed_model
+            )
+        self.ledger = ledger
+        self.llm = llm if llm is not None else LLM.from_settings(self.settings)
         self.verifier = Verifier(self.ledger, self.llm, self.settings.nli_model)
         self.history: dict[str, ClaimVerdict] = {}  # claim_id -> verdict (for explain_verdict)
         self.reports: list[Report] = []

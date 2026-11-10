@@ -24,6 +24,10 @@ dependencies = [
 # Tier 1 (NLI fact-checking model) and dense retrieval. Runs on CPU.
 ml = ["sentence-transformers>=3.0", "torch>=2.2", "transformers>=4.40"]
 eval = ["matplotlib>=3.8", "tabulate>=0.9"]
+demo = [
+    "imageio-ffmpeg>=0.8.1",
+    "pillow>=13.0.0",
+]
 
 [project.scripts]
 hfw = "hfw.cli:main"

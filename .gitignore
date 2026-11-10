@@ -11,3 +11,6 @@ build/
 evals/data/
 evals/custom_traces/*.jsonl
 docs/demo/frames/
+
+# local MCP registration (machine-specific paths)
+.mcp.json

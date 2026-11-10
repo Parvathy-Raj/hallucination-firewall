@@ -95,3 +95,16 @@ def test_stop_hook_allows_no_tool_turn_and_no_loop(tmp_path, capsys):
     stop({"transcript_path": _transcript(tmp_path, [])})
     stop({"transcript_path": _transcript(tmp_path, ["WebFetch"]), "stop_hook_active": True})
     assert capsys.readouterr().out == ""
+
+
+def test_server_ledger_is_shared_with_hook(tmp_path, monkeypatch):
+    """The server must persist to the same file the Claude Code hook appends to."""
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("HFW_STATE_DIR", str(tmp_path / ".hfw"))
+    server = build_server(proxy_config="")
+    fw = server.firewall
+    fw.policy.update(tiers=[0])
+    capture({"tool_name": "WebFetch", "cwd": str(tmp_path), "tool_response": "Q3 revenue was $4.2M."})
+    assert fw.verify("Q3 revenue was $4.7M.").blocked  # evidence from the hook is picked up
+    fw.record("manual", "Headcount is 140.")
+    assert (tmp_path / ".hfw" / "ledger.jsonl").read_text().count("\n") == 2
