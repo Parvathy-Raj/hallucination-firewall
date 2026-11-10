@@ -190,10 +190,34 @@ def _same(a: Qty, b: Qty) -> bool:
     return abs(a.value - b.value) <= coarse.unit / 2 + 1e-9
 
 
+def _stem(t: str) -> str:
+    """Very light stemming so "exceeded"/"exceeds"/"exceed" and "months"/"month" match."""
+    for suf in ("ing", "ed", "es", "s"):
+        if len(t) > len(suf) + 3 and t.endswith(suf):
+            return t[: -len(suf)]
+    return t
+
+
 def _context(text: str, q: Qty, window: int = 8) -> set[str]:
     left = tokenize(text[: q.start])[-window:]
     right = tokenize(text[q.end :])[:window]
-    return set(left + right)
+    return {_stem(t) for t in left + right}
+
+
+# Words that say whether a rule is an obligation or an option. A threshold described as
+# "voluntary" is a different fact from one described as "mandatory", even when the rest
+# of the sentence matches.
+_OBLIGATION = {"must", "mandatory", "required", "require", "obliged", "obligation", "compulsory", "shall"}
+_OPTION = {"voluntary", "voluntarily", "optional", "may", "can", "option"}
+
+
+def _polarity(tokens: set[str]) -> int:
+    ob, op = bool(tokens & _OBLIGATION), bool(tokens & _OPTION)
+    return 1 if ob and not op else -1 if op and not ob else 0
+
+
+def _near(text: str, q: Qty, window: int = 12) -> set[str]:
+    return set(tokenize(text[: q.start], drop_stop=False)[-window:] + tokenize(text[q.end :], drop_stop=False)[:4])
 
 
 @dataclass
@@ -222,6 +246,7 @@ def check(claim: str, passages: list[str]) -> ExactResult:
 
     pq = [extract_quantities(p) for p in passages]
     claim_tokens = set(tokenize(claim))
+    claim_pol = _polarity(set(tokenize(claim, drop_stop=False)))
     missing: list[Qty] = []
     best_conflict: tuple[float, Qty, Qty, int] | None = None
     for q in cq:
@@ -240,6 +265,9 @@ def check(claim: str, passages: list[str]) -> ExactResult:
                 overlap = len(qctx & ectx) / max(1, len(qctx))
                 topical = len(claim_tokens & set(tokenize(passages[pi]))) / max(1, len(claim_tokens))
                 score = overlap * 0.7 + topical * 0.3 - pi * 0.02
+                if claim_pol:
+                    ev_pol = _polarity(_near(passages[pi], e))
+                    score += 0.2 if ev_pol == claim_pol else -0.4 if ev_pol == -claim_pol else 0.0
                 if best_conflict is None or score > best_conflict[0]:
                     best_conflict = (score, q, e, pi)
 

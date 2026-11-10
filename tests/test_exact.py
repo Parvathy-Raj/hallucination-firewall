@@ -66,3 +66,19 @@ def test_json_field_context_picks_right_number():
 def test_names_matched_word_by_word():
     r = check("Invoice INV-1042 is unpaid.", ["invoice_id: INV-1042\nstatus: unpaid"])
     assert r.verdict == "abstain"
+
+
+def test_correction_prefers_same_obligation_threshold():
+    """A mandatory-threshold claim must be corrected with the mandatory value, not the voluntary one."""
+    voluntary = ("A person can voluntarily register for VAT if, at the end of any month, the total value of "
+                 "the person's taxable supplies and imports in the previous 12 months exceeds the Voluntary "
+                 "Registration Threshold of AED 187,500.")
+    mandatory = ("A person resident in the UAE is required to register for VAT if the total value of their "
+                 "taxable supplies made within the UAE and imports into the UAE exceeded AED 375,000 over the "
+                 "previous 12-month period.")
+    claim = "A person must register for VAT once their taxable supplies exceed AED 500,000 over the previous 12 months."
+    r = check(claim, [voluntary, mandatory])
+    assert r.verdict == "contradicted"
+    assert r.correction == ("AED 500,000", "AED 375,000")
+    r2 = check("You can register voluntarily once supplies exceed AED 200,000.", [mandatory, voluntary])
+    assert r2.correction == ("AED 200,000", "AED 187,500")
