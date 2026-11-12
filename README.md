@@ -6,7 +6,7 @@ Agents call tools, get correct data back, and still misstate it in the answer: a
 
 https://github.com/Parvathy-Raj/hallucination-firewall/raw/main/docs/demo.mp4
 
-*Demo: Claude Code answers a UAE VAT question using a document-search tool. The draft gets the registration threshold wrong; the firewall flags it ❌, cites the FTA guide passage with the correct figure, and the corrected answer goes out with a citation.*
+*Demo: a draft client email about UAE VAT registration is checked against the FTA guides, searched through the firewall's proxy. The firewall blocks two wrong figures ❌ (AED 500,000 should be AED 375,000; 60 days should be 30 days), confirms the two correct claims ✅, and rewrites the email with a citation to the guide passage behind each line.*
 
 ```
 ┌──────────┐     ┌────────────────────────────┐     ┌──────────────────┐
